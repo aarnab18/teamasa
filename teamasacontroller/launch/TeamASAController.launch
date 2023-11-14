@@ -1,0 +1,31 @@
+<launch>
+
+  <!-- In this launchfile, we demonstrate how to set some initial variables as parameters,
+  	how to record the output file to a place that is persistent, and how to 
+	use a namespace for the node in which we are running. -->
+
+  <!-- This commands the acceleration of the leader car for a short test -->
+  <arg name="topic_name" default="/leadcar/cmd_accel" />
+  <arg name="message" default="0.1" />
+  
+  <!-- change the output directory and prefix if this is not where yours is mapped -->
+  <arg name="bagfileout" default="/ros/catkin_ws/simulinkcartest"/>
+
+  <!-- sets the initial velocity of the lead car. -->
+  <param name="/leadcar/v0" type="double" value="10.0" />
+  <!-- sets the initial position of the lead car. -->
+  <param name="/leadcar/x0" type="double" value="40.0" />
+
+  <node pkg="rostopic" type="rostopic" name="rostopic_pub_node" output="screen" args="pub -r 20 $(arg topic_name) std_msgs/Float64 'data: $(arg message)'" />
+  
+  <!-- By putting this car into a namespace, we keep the variables clean -->
+  <group ns="leadcar">
+	<node pkg="teamasa" type="TeamASAController" name="TeamASAController_node">
+	
+	</node>
+  </group>
+  
+  <!-- change the output directory if this is not where yours is mapped -->
+  <node pkg="rosbag" type="record" name="rosbag_recorder" args="-a -o $(arg bagfileout)" />
+  
+</launch>
